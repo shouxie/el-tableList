@@ -5,9 +5,9 @@
     "utils": {
       "plugins": [
         ["module-resolver", {
-          "root": ["dlj-table"],
+          "root": ["dlj-components"],
           "alias": {
-            "dlj-table/src": "dlj-table/lib"
+            "dlj-components/src": "dlj-components/lib"
           }
         }]
       ]

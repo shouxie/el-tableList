@@ -1,8 +1,8 @@
 <template>
 	<div class='dlj-search'>
 		<div>dcdscdcscsdcscsccscscscscssc</div>
-		<el-form inline ref="dlj-form" :label-width="`${labelWidth}px`" label-position="right">
-			<el-form-item v-for="(form index) in forms" :key="index" :label="form.labelType === 'string' ? form.label : ''">
+		<!-- <el-form inline ref="dlj-form" :label-width="`${labelWidth}px`" label-position="right">
+			<el-form-item v-for="(form, index) in forms" :key="index" :label="form.labelType === 'string' ? form.label : ''">
 				<el-select
 					v-if="form.labelType === 'html'"
 					v-modal="params[form.modelLabelValue]"
@@ -78,37 +78,37 @@
 		<div class='dlj-searchBtn-area'>
 			<el-button type='primary' @click="search">查询</el-button>
 			<el-button type='primary' @click="reset">重置</el-button>
-		</div>
+		</div> -->
 	</div>
 </template>
 <script>
 	import { formProps } from './props';
 
 	export default {
-		name: "ElSearchForm",
+		name: "DljSearchForm",
 		props: formProps,
-		data () {
-			const { forms } = this.$props;
-			let params = {};
-			forms.forEach(form => {
-				const propType = typeof form.prop;
-				if (form.labelType === 'html') {
-					params[form.labelProp] = '';
-				}
-				if (propType === 'string') {
-					params[form.prop] = '';
-				} else {
-					form.prop.forEach(v => {
-						params[v] = '';
-					});
-				}
-			});
-			return {
-				formItemWidth: '204px',
-				params
-			}
+		// data () {
+		// 	const { forms } = this.$props;
+		// 	let params = {};
+		// 	forms.forEach(form => {
+		// 		const propType = typeof form.prop;
+		// 		if (form.labelType === 'html') {
+		// 			params[form.labelProp] = '';
+		// 		}
+		// 		if (propType === 'string') {
+		// 			params[form.prop] = '';
+		// 		} else {
+		// 			form.prop.forEach(v => {
+		// 				params[v] = '';
+		// 			});
+		// 		}
+		// 	});
+		// 	return {
+		// 		formItemWidth: '204px',
+		// 		params
+		// 	}
 
-		},
+		// },
 		methods: {
 			isArray(val) {
 				return typeof val === 'object' && Object.prototype.toString.call(val) === '[object Array]';
@@ -123,3 +123,6 @@
 		}
 	}
 </script>
+<style lang='less' scoped>
+@import '../../styles/search.less';
+</style>
