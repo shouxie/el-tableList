@@ -1,0 +1,36 @@
+{
+  "name": "dlj-table",
+  "version": "0.0.1",
+  "description": "a component with Element UI for dalingjia's tables",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cooking watch",
+    "build": "cooking build -c build/cooking.conf.js,build/cooking.common.js,build/cooking.index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "@dal/element-ui": "^2.7.2",
+    "vue": "^2.5.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-transform-vue-jsx": "^3.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "cooking": "^1.5.4",
+    "cooking-vue2": "^0.3.3",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "html-webpack-plugin": "^2.30.1",
+    "vue-template-compiler": "^2.5.9",
+    "webpack": "^3.8.1",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "vue": "^2.5.2"
+  }
+}
