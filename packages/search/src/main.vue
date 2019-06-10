@@ -74,8 +74,8 @@
 					></el-option>
 				</el-select>
 			</el-form-item>
-		</el-form>
-		<div class='dlj-searchBtn-area'>
+		</el-form> -->
+		<!-- <div class='dlj-searchBtn-area'>
 			<el-button type='primary' @click="search">查询</el-button>
 			<el-button type='primary' @click="reset">重置</el-button>
 		</div> -->

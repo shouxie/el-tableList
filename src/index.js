@@ -1,9 +1,10 @@
 import SearchTablePagination from '../packages/search-table-pagination/index.js';
 import SearchForm from '../packages/search/index.js';
 import DljTitle from '../packages/dlj-title/index.js';
+import DljList from '../packages/dlj-list/index.js';
 import pkg from '../package.json';
 
-const components = [SearchTablePagination, SearchForm, DljTitle];
+const components = [SearchTablePagination, SearchForm, DljTitle, DljList];
 
 const install = (Vue, opts = {}) => {
   components.map(component => {
@@ -20,5 +21,6 @@ export default {
   install,
   SearchTablePagination,
   SearchForm,
-  DljTitle
+  DljTitle,
+  DljList
 }
