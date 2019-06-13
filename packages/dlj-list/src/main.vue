@@ -13,28 +13,29 @@
         	<div ref='dljForm' class='formArea' :style='`height: ${height === "100%" ? "auto" : height + "px"}`'>
 	        	<el-form inline :label-width="`${labelWidth}px`" label-position="right">
 					<el-form-item v-for="(form, index) in forms" :key="index" :label="form.labelType === 'string' || !form.labelType ? form.label : ''">
-						<el-select
-							v-if="form.labelType === 'html'"
-							v-model="params[form.modelLabelVal]"
-							slot='label'
-						>
-							<el-option 
-								v-for="(option, optionIndex) in form.labelOptions" 
-								:key="optionIndex"
-								:label="(typeof option === 'object') ? option[form.labelKey || 'label'] : option"
-								:value="(typeof option === 'object') ? option[form.valueKey || 'value'] : option"
-							></el-option>
-						</el-select>
+						<template v-if="form.labelType === 'html'">
+							<el-select
+								slot='label'
+								v-model="params[form.labelValue]"
+							>
+								<el-option 
+									v-for="(option, optionIndex) in form.labelOptions" 
+									:key="optionIndex"
+									:label="(typeof option === 'object') ? option[form.labelKey || 'label'] : option"
+									:value="(typeof option === 'object') ? option[form.valueKey || 'value'] : option"
+								></el-option>
+							</el-select>
+						</template>
 						<el-input
-						 	v-if="form.type==='input' || !form.type" 
-						 	v-model="params[form.modelVal]" 
+						 	v-if="form.type==='input' || (primaryType === 'input' && !form.type)" 
+						 	v-model="params[form.value]" 
 						 	:style="`width: ${formItemWidth}`"
 						 	:palceholder="form.palceholder"
 						 >
 						</el-input>
 						<el-date-picker
-							v-else-if="form.type==='date'"
-							v-model="params[form.modelVal]"
+							v-else-if="form.type==='date' || (primaryType === 'date' && !form.type)"
+							v-model="params[form.value]"
 							:style="`width: ${formItemWidth}`"
 						 	:palceholder="form.palceholder"
 						 	:format="form.format || 'yyyy-MM-dd HH:mm:ss'"
@@ -44,9 +45,9 @@
 						 	@change="date => form.change && form.change(date)"
 						>
 						</el-date-picker>
-						<template v-else-if="form.type==='daterange'">
+						<template v-else-if="form.type==='daterange' || (primaryType === 'daterange' && !form.type)">
 							<el-date-picker
-								v-model="params[form.modelVal[0]]"
+								v-model="params[form.value[0]]"
 								:style="`width: ${formItemWidth}`"
 							 	:palceholder="form.palceholder"
 							 	:format="form.format || 'yyyy-MM-dd HH:mm:ss'"
@@ -58,7 +59,7 @@
 							</el-date-picker>
 							<span> ~ </span>
 							<el-date-picker
-								v-model="params[form.modelVal[1]]"
+								v-model="params[form.value[1]]"
 								:style="`width: ${formItemWidth}`"
 							 	:palceholder="form.palceholder"
 							 	:format="form.format || 'yyyy-MM-dd HH:mm:ss'"
@@ -70,8 +71,10 @@
 							</el-date-picker>
 						</template>
 						<el-select
-							v-else-if="form.type === 'select'"
-							v-model="params[form.modelVal]"
+							v-else-if="form.type === 'select' || (primaryType === 'select' && !form.type)"
+							clearable
+							filterable
+							v-model="params[form.value]"
 							:style="`width: ${formItemWidth}`"
 						 	:palceholder="form.palceholder"
 
@@ -83,6 +86,48 @@
 								:value="(typeof option === 'object') ? option[form.valueKey || 'value'] : option"
 							></el-option>
 						</el-select>
+						 <template v-else-if="form.type === 'multiple' || (primaryType === 'multiple' && !form.type)">
+							 <template v-for='(item, $ind) in form.items'>
+								<el-input
+							 	:key="$ind"
+							 	v-if="item.type==='input'" 
+							 	v-model="params[item.value]" 
+							 	:style="`width: ${formItemWidth}`"
+							 	:palceholder="item.palceholder"
+							 ></el-input>
+							 <span :key="$ind" v-else-if="item.type==='span'"> ~ </span>
+							 <el-select
+							 	:key="$ind"
+								v-else-if="item.type === 'select'"
+								clearable
+								filterable
+								v-model="params[item.value]"
+								:style="`width: ${formItemWidth}`"
+							 	:palceholder="item.palceholder"
+
+							>
+								<el-option 
+									v-for="(option, optionIndex) in item.options" 
+									:key="optionIndex"
+									:label="(typeof option === 'object') ? option[item.labelKey || 'label'] : option"
+									:value="(typeof option === 'object') ? option[item.valueKey || 'value'] : option"
+								></el-option>
+							</el-select>
+							<el-date-picker
+								:key="$ind"
+								v-else-if="item.type==='date'"
+								v-model="params[item.value]"
+								:style="`width: ${formItemWidth}`"
+							 	:palceholder="item.palceholder"
+							 	:format="item.format || 'yyyy-MM-dd HH:mm:ss'"
+							 	:value-format="item.valueFormat || 'yyyy-MM-dd HH:mm:ss'"
+							 	:type="item.dateType || 'datetime'"
+							 	:picker-options="item.pickerOptions || {}"
+							 	@change="date => item.change && item.change(date)"
+							>
+							</el-date-picker>
+							</template>
+						</template>
 					</el-form-item>
 				</el-form>
         	</div>
@@ -121,6 +166,19 @@
 	                        <template slot-scope="props">
 	                            <slot name='expand' :data="props.row"></slot>
 	                        </template>
+	                    </el-table-column>
+	                    <el-table-column
+	                    	align="center"
+	                        v-else-if="item.href"
+	                        :prop="item.prop"
+	                        :label="item.label || '操作'"
+	                        :fixed="item.fixed"
+	                        :min-width="`${item.width}px`"
+	                        :key="$index"
+	                    >
+	                    	<template slot-scope='scope'>
+	                    		<span @click='item.href(scope.row)'>{{scope.row[item.prop]}} <i class='el-icon-view'></i></span>
+	                    	</template>
 	                    </el-table-column>
 	                    <el-table-column
 	                        align="center"
@@ -166,6 +224,32 @@
 					    		<slot  :item='scope.row' :label='item' :value='scope.row[item.prop]'></slot>
 					    	</template>
 					    </el-table-column>
+					    <el-table-column
+					    	v-else-if='item.inner'
+					    	:key='$index'
+					    	:fixed="item.fixed"
+	                        :label="item.label"
+	                        align="center"
+	                        :prop='item.prop'
+	                        :width="item.width"
+					    >
+					    	<template slot-scope='scope'>
+					    		<span v-html='item.innerHtml'></span>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column
+							v-else-if='item.filter'
+					    	:key='$index'
+					    	:fixed="item.fixed"
+	                        :label="item.label"
+	                        align="center"
+	                        :prop='item.prop'
+	                        :width="item.width"
+					    >
+					    	<template slot-scope="scope">
+					    		<span>{{scope.row[item.prop] ? item.filter(scope.row, item.prop) : ''}}</span>
+					    	</template>
+					    </el-table-column>
 	                    <el-table-column
 	                        align="center"
 	                        v-else
@@ -202,46 +286,74 @@ export default {
 	data () {
 		// const { forms } = this.$props;
 		// console.log(this.$props, this.$props.forms, this.$props.title, 'this.$props;')
-		const { forms, pageSizeKey, pageStartKey } = this.$props;
-		let params = {};
-		forms.forEach(form => {
-			const modelValType = typeof form.modelVal;
-			if (form.labelType === 'html') {
-				params[form.modelLabelVal] = '';
-			}
-			if (modelValType === 'string') {
-				params[form.modelVal] = '';
-			} else {
-				form.modelVal.forEach(v => {
-					params[v] = '';
-				});
-			}
-		});
-		params[pageSizeKey] = 1;
-		params[pageStartKey] = 1;
+		const { forms, pageSizeKey, pageStartKey, defaultparams } = this.$props;
+		//let params = {};
+		//saleList.find(v => v[1] === '达令家') && saleList.find(v => v[1] === '达令家')[0]
+		//params[pageSizeKey] = 1;
+		//params[pageStartKey] = 1;
 		return {
 			formItemWidth: '204px',
-			params,
+			params: defaultparams,
 			loading: false,
 			sizes: [10, 50, 100, 200],
 			size: 10,
 			page: 1,
 			flod: -1,
             height: '100%',
-            selected: []
+            selected: [],
+            haveForm: false
 		}
 
 	},
+	watch: {
+		forms: {
+			handler: function(val) {
+				// console.log(val, 'valvalval')
+				if(val && val.length) {
+					this.haveForm = false;
+					let params = this.params;
+					val.forEach(form => {
+						// console.log(form, 'formformform')
+						const valueType = typeof form.value;
+						if (form.labelType === 'html') {
+							params[form.labelValue] = form.defaultLabelVal ? form.defaultLabelVal : '';
+						}
+						if (valueType === 'string') {
+							params[form.value] = form.defaultVal ? form.defaultVal : '';
+						} else {
+							// console.log(form.value, 'formformform')
+							form.value.forEach(v => {
+								params[v] = '';
+							});
+						}
+					});
+					this.haveForm = true;
+					this.$nextTick(() => {
+						// console.log(this.$refs.dljForm, this.$refs.dljForm.offsetHeight , 'watchthis.$refs.dljForm.offsetHeight ')
+						if(this.$refs.dljForm.offsetHeight <= 66) { 
+			                this.height = '100%';
+			                this.flod = -1;
+			            } else {
+			                this.height = '66';
+			                this.flod = 1;
+			            }
+					});
+				}
+			},
+			deep: true
+		}
+	},
 	mounted() {
-        this.$nextTick(() => {
-            if(this.$refs.dljForm.offsetHeight <= 66) {
-                this.height = '100%'
-                this.flod = -1
+        /*this.$nextTick(() => {
+        	console.log(this.$refs.dljForm, this.$refs.dljForm.offsetHeight , 'this.$refs.dljForm.offsetHeight ')
+            if(this.$refs.dljForm.offsetHeight <= 66) { 
+                this.height = '100%';
+                this.flod = -1;
             } else {
-                this.height = '66'
-                this.flod = 1
+                this.height = '66';
+                this.flod = 1;
             }
-        })
+        })*/
     },
 	methods: {
 		handleSelectionChange(val) {
@@ -249,23 +361,21 @@ export default {
 		},
 		change() {
             if(this.height === '66') {
-                this.height = '100%'
+                this.height = '100%';
             } else if(this.height === '100%') {
-                this.height = '66'
+                this.height = '66';
             }
-            this.flod = !this.flod * 1
+            this.flod = !this.flod * 1;
         },
 		async search() {
 			if(this.loading) return;
 			this.loading = true;
-			// this.params[this.pageSizeKey] = this.size;
-			// this.params[this.pageStartKey] = this.page;
-			console.log(this.params);
+			// console.log(this.params);
 			let res = await this.$emit('getTest', this.params);
 			this.loading = false;
 		},
 		reset() {
-			console.log('reset');
+			// console.log('reset');
 		},
 		handleCurrentChange(val) {
 			this.page = val;
@@ -278,6 +388,45 @@ export default {
 	      	this.$emit("getTest", this.params);
 	    }
 	}
+	/*<!-- <div v-for='(item, $ind) in form.items'>
+								<el-input
+							 	:key="$ind"
+							 	v-if="item.type==='input'" 
+							 	v-model="params[item.value]" 
+							 	:style="`width: ${formItemWidth}`"
+							 	:palceholder="item.palceholder"
+							 ></el-input>
+							 <el-select
+							 	:key="$ind"
+								v-else-if="item.type === 'select'"
+								clearable
+								filterable
+								v-model="params[item.value]"
+								:style="`width: ${formItemWidth}`"
+							 	:palceholder="item.palceholder"
+
+							>
+								<el-option 
+									v-for="(option, optionIndex) in item.options" 
+									:key="optionIndex"
+									:label="(typeof option === 'object') ? option[item.labelKey || 'label'] : option"
+									:value="(typeof option === 'object') ? option[item.valueKey || 'value'] : option"
+								></el-option>
+							</el-select>
+							<el-date-picker
+								:key="$ind"
+								v-else-if="item.type==='date'"
+								v-model="params[item.value]"
+								:style="`width: ${formItemWidth}`"
+							 	:palceholder="item.palceholder"
+							 	:format="item.format || 'yyyy-MM-dd HH:mm:ss'"
+							 	:value-format="item.valueFormat || 'yyyy-MM-dd HH:mm:ss'"
+							 	:type="item.dateType || 'datetime'"
+							 	:picker-options="item.pickerOptions || {}"
+							 	@change="date => item.change && item.change(date)"
+							>
+							</el-date-picker>
+							</div> -->*/
 }
 </script>
 <style lang='less' scoped>

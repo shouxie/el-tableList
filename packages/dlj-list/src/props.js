@@ -6,12 +6,19 @@ export const props = {
 		type: String,
 		required: true
 	},
+	primaryType: {
+		type: String,
+		default: 'input'
+	},
 	labelWidth: {
 		type: Number,
 		default: 145
 	},
 	forms: {
 		type: Array
+	},
+	defaultparams: {
+		type: Object
 	},
 	searchBtns: {
 		type: Array
